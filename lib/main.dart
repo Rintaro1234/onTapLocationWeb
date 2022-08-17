@@ -67,6 +67,14 @@ class _showMap extends State<showMap> {
     });
   }
 
+  void clear(){
+    setState(() {
+      data = "";
+      dots = [];
+      markers = [];
+    });
+  }
+
   void output(String out) async{
     out='{\n "component": [\n{\n"dot":[\n' + out + ']\n}\n]\n}';
     String? path = await getSavePath(acceptedTypeGroups: [
@@ -83,17 +91,17 @@ class _showMap extends State<showMap> {
 
   void init(){
     output(data);
-    data = "";
-    dots = [];
-    markers = [];
     setState(() {
+      data = "";
+      dots = [];
+      markers = [];
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: new Stack(
+      body: Stack(
         children: <Widget>[
           FlutterMap(
             options: MapOptions(
@@ -135,9 +143,41 @@ class _showMap extends State<showMap> {
               )
             ],
           ),
-          FloatingActionButton(onPressed: init),
+          Column(children: [
+            FloatingActionButton(onPressed: init, child: Icon(Icons.file_download),),
+            FloatingActionButton(onPressed: () async {
+                int? num = await showDialog<int>(context: context, builder:(_) {return checkDelete();});
+                if(num == 0) clear();
+              },
+              child: Icon(Icons.delete),),
+            ],
+          ),
         ]
       )
+    );
+  }
+}
+
+
+
+class checkDelete extends StatelessWidget {
+  const checkDelete({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text("道を削除します"),
+      content: Text("この作業は取り消すことができません"),
+      actions: [
+        GestureDetector(
+          child: Icon(Icons.cancel_outlined),
+          onTap: () {Navigator.pop(context, -1);},
+        ),
+        GestureDetector(
+          child: Icon(Icons.delete),
+          onTap: () {Navigator.pop(context, 0);},
+        )
+      ],
     );
   }
 }
