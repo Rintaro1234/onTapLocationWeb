@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' show json;
 import 'package:file_selector/file_selector.dart';
 import 'dart:convert';
-import 'dart:typed_data';
 import 'dart:html' as html;
 
 Future<double> getAltitude(double lat, double long) async{
