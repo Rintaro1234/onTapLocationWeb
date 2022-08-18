@@ -51,6 +51,7 @@ class _showMap extends State<showMap> {
   String data = "";
   List<CircleMarker> markers = [];
   List<Polyline> inputLine = [];
+  List<Marker> inputMarker = [];
 
   @override
   void initState() {
@@ -109,7 +110,22 @@ class _showMap extends State<showMap> {
       for(int dot = 0; dot < dotSize; dot++){
         buf.add(LatLng(inputJson['component'][com]['dot'][dot]['latitude'], inputJson['component'][com]['dot'][dot]['longitude']));
       }
-      inputLine.add(Polyline(points: buf, color: Colors.pink, strokeWidth: 12.0,));
+      inputLine.add(Polyline(points: buf, color: Colors.blue, strokeWidth: 12.0,));
+      inputMarker.add(Marker(
+        point: buf[0],
+        width: 200,
+        height: 80,
+        builder: (ctx) => Column(children :[Icon(Icons.flag, size: 50, color: Colors.black,),Text(file.name + "_start")] ),
+      ));
+      inputMarker.add(Marker(
+        point: buf[dotSize -1],
+        width: 200,
+        height: 80,
+        builder: (ctx) => Column(children :[Icon(Icons.flag, size: 50, color: Colors.black,),Text(file.name + "_end")] ),
+      ));
+      setState(() {
+
+      });
     }
   }
 
@@ -138,11 +154,11 @@ class _showMap extends State<showMap> {
               getAltitude(tapPosition.latitude, tapPosition.longitude).then((value)
               {
                 altitude = value;
-                print('{\n\"longitude\":${tapPosition.longitude},\n\"latitude"\:${tapPosition.latitude},\n\"altitude"\:${altitude}\n},');
+                print('{\n    \"longitude\":${tapPosition.longitude},\n    \"latitude"\:${tapPosition.latitude},\n    \"altitude"\:${altitude}\n},');
                 if(data == ''){
-                  data += '{\n\"longitude\":${tapPosition.longitude},\n\"latitude"\:${tapPosition.latitude},\n\"altitude"\:${altitude}\n}';
+                  data += '{\n    \"longitude\":${tapPosition.longitude},\n    \"latitude"\:${tapPosition.latitude},\n    \"altitude"\:${altitude}\n}';
                 }else{
-                  data += ',\n{\n\"longitude\":${tapPosition.longitude},\n\"latitude"\:${tapPosition.latitude},\n\"altitude"\:${altitude}\n}';
+                  data += ',\n{\n    \"longitude\":${tapPosition.longitude},\n    \"latitude"\:${tapPosition.latitude},\n    \"altitude"\:${altitude}\n}';
                 }
               });
             }
@@ -155,12 +171,15 @@ class _showMap extends State<showMap> {
               CircleLayerOptions(
                 circles: markers,
               ),
+              MarkerLayerOptions(
+               markers: inputMarker,
+              ),
               PolylineLayerOptions(
                 polylineCulling: false,
                 polylines: [
                   Polyline(
                   points: dots,
-                  color: Colors.red,
+                  color: Colors.lightBlueAccent,
                   strokeWidth: 12.0,
                   ),
                 ],
@@ -182,7 +201,20 @@ class _showMap extends State<showMap> {
             FloatingActionButton(onPressed: input, child: Icon(Icons.input),),
             ],
           ),
-        ]
+          Align(
+            alignment: Alignment.centerRight,
+            child: Container(
+            color: Colors.black,
+              child: SingleChildScrollView(
+                reverse: true,
+                child: Padding(
+                  padding: EdgeInsets.all(8),
+                  child:Text(data, style: TextStyle(color:Colors.green),),
+                )
+              )
+            ),
+          )
+        ],
       )
     );
   }
