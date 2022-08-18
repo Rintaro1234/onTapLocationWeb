@@ -201,19 +201,6 @@ class _showMap extends State<showMap> {
             FloatingActionButton(onPressed: input, child: Icon(Icons.input),),
             ],
           ),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-            color: Colors.black,
-              child: SingleChildScrollView(
-                reverse: true,
-                child: Padding(
-                  padding: EdgeInsets.all(8),
-                  child:Text(data, style: TextStyle(color:Colors.green),),
-                )
-              )
-            ),
-          )
         ],
       )
     );
