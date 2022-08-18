@@ -50,6 +50,7 @@ class _showMap extends State<showMap> {
   List<LatLng> dots = [];
   String data = "";
   List<CircleMarker> markers = [];
+  List<Polyline> inputLine = [];
 
   @override
   void initState() {
@@ -86,6 +87,29 @@ class _showMap extends State<showMap> {
               out);
       anchor.download = "road.json";
       anchor.click();
+    }
+  }
+
+  void input() async{
+    final XTypeGroup typeGroup = XTypeGroup(
+      label: 'json',
+      extensions: ['json'],
+    );
+    final XFile? file =
+    await openFile(acceptedTypeGroups: [typeGroup]);
+    if (file == null) {
+      return;
+    }
+    final String fileContent = await file.readAsString();
+    Map<String, dynamic> inputJson = jsonDecode(fileContent);
+    int comSize = inputJson['component'].length;
+    for(int com = 0; com < comSize; com++){
+      int dotSize = inputJson['component'][com]['dot'].length;
+      List<LatLng> buf = [];
+      for(int dot = 0; dot < dotSize; dot++){
+        buf.add(LatLng(inputJson['component'][com]['dot'][dot]['latitude'], inputJson['component'][com]['dot'][dot]['longitude']));
+      }
+      inputLine.add(Polyline(points: buf, color: Colors.pink, strokeWidth: 12.0,));
     }
   }
 
@@ -136,11 +160,15 @@ class _showMap extends State<showMap> {
                 polylines: [
                   Polyline(
                   points: dots,
-                  color: Colors.blue,
-                  strokeWidth: 3.0,
+                  color: Colors.red,
+                  strokeWidth: 12.0,
                   ),
                 ],
-              )
+              ),
+              PolylineLayerOptions(
+                polylineCulling:  false,
+                polylines: inputLine,
+              ),
             ],
           ),
           Column(children: [
@@ -149,7 +177,9 @@ class _showMap extends State<showMap> {
                 int? num = await showDialog<int>(context: context, builder:(_) {return checkDelete();});
                 if(num == 0) clear();
               },
-              child: Icon(Icons.delete),),
+              child: Icon(Icons.delete),
+            ),
+            FloatingActionButton(onPressed: input, child: Icon(Icons.input),),
             ],
           ),
         ]
