@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -6,6 +7,7 @@ import 'dart:convert' show json;
 import 'package:file_selector/file_selector.dart';
 import 'dart:convert';
 import 'dart:html' as html;
+import 'package:flutter/gestures.dart';
 
 Future<double> getAltitude(double lat, double long) async{
   double altitude = 0.0;
@@ -52,6 +54,8 @@ class _showMap extends State<showMap> {
   List<CircleMarker> markers = [];
   List<Polyline> inputLine = [];
   List<Marker> inputMarker = [];
+  final controller = TextEditingController();
+  var position = const Offset(400, 0);
 
   @override
   void initState() {
@@ -103,6 +107,9 @@ class _showMap extends State<showMap> {
     }
     final String fileContent = await file.readAsString();
     Map<String, dynamic> inputJson = jsonDecode(fileContent);
+
+    controller.text = fileContent.toString();
+
     int comSize = inputJson['component'].length;
     for(int com = 0; com < comSize; com++){
       int dotSize = inputJson['component'][com]['dot'].length;
@@ -115,13 +122,19 @@ class _showMap extends State<showMap> {
         point: buf[0],
         width: 200,
         height: 80,
-        builder: (ctx) => Column(children :[Icon(Icons.flag, size: 50, color: Colors.black,),Text(file.name + "_start")] ),
+        builder: (ctx) => Column(children :[
+          Icon(Icons.flag, size: 50, color: Colors.black,),
+          Container(child: Text(inputJson['component'][com]['index'].toString() + "_start"), color: Colors.white,)
+        ]),
       ));
       inputMarker.add(Marker(
         point: buf[dotSize -1],
         width: 200,
         height: 80,
-        builder: (ctx) => Column(children :[Icon(Icons.flag, size: 50, color: Colors.black,),Text(file.name + "_end")] ),
+          builder: (ctx) => Column(children :[
+            Icon(Icons.flag, size: 50, color: Colors.black,),
+            Container(child: Text(inputJson['component'][com]['index'].toString() + "_end"), color: Colors.white,)
+          ])
       ));
       setState(() {
 
@@ -168,12 +181,6 @@ class _showMap extends State<showMap> {
                 urlTemplate: "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",
                 subdomains: ['a', 'b', 'c'],
               ),
-              CircleLayerOptions(
-                circles: markers,
-              ),
-              MarkerLayerOptions(
-               markers: inputMarker,
-              ),
               PolylineLayerOptions(
                 polylineCulling: false,
                 polylines: [
@@ -188,6 +195,12 @@ class _showMap extends State<showMap> {
                 polylineCulling:  false,
                 polylines: inputLine,
               ),
+              CircleLayerOptions(
+                circles: markers,
+              ),
+              MarkerLayerOptions(
+                markers: inputMarker,
+              ),
             ],
           ),
           Column(children: [
@@ -201,6 +214,48 @@ class _showMap extends State<showMap> {
             FloatingActionButton(onPressed: input, child: Icon(Icons.input),),
             ],
           ),
+          GestureDetector(
+            dragStartBehavior: DragStartBehavior.down,
+            onPanUpdate: (dragUpdateDetails) {
+              position = dragUpdateDetails.localPosition;
+              setState(() {});
+            },
+            child: Stack(children : [Positioned(
+              // 左上からどれだけ右にあるか
+              left: position.dx,
+              // 左上からどれだけ下にあるか
+              top: position.dy,
+              child: Container(
+                width: 400,
+                height: 400,
+                child: TextField(
+                  controller: controller,
+                  maxLines: null,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.5),
+                  border: Border(
+                    left: BorderSide(
+                      color: Colors.black.withOpacity(0.5),
+                      width: 3,
+                    ),
+                    top: BorderSide(
+                      color: Colors.black.withOpacity(0.5),
+                      width: 8,
+                    ),
+                    right: BorderSide(
+                      color: Colors.black.withOpacity(0.5),
+                      width: 3,
+                    ),
+                    bottom: BorderSide(
+                      color: Colors.black.withOpacity(0.5),
+                      width: 3,
+                    ),
+                  )
+                ),
+              ),)],
+            ),
+          )
         ],
       )
     );
