@@ -124,7 +124,7 @@ class _showMap extends State<showMap> {
         height: 80,
         builder: (ctx) => Column(children :[
           Icon(Icons.flag, size: 50, color: Colors.black,),
-          Container(child: Text(inputJson['component'][com]['index'].toString() + "_start"), color: Colors.white,)
+          Container(child: Text(inputJson['component'][com]['index'].toString() + "_start"), color: Colors.white.withOpacity(0.5),)
         ]),
       ));
       inputMarker.add(Marker(
@@ -133,7 +133,7 @@ class _showMap extends State<showMap> {
         height: 80,
           builder: (ctx) => Column(children :[
             Icon(Icons.flag, size: 50, color: Colors.black,),
-            Container(child: Text(inputJson['component'][com]['index'].toString() + "_end"), color: Colors.white,)
+            Container(child: Text(inputJson['component'][com]['index'].toString() + "_end"), color: Colors.white.withOpacity(0.5),)
           ])
       ));
       setState(() {
