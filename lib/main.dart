@@ -137,7 +137,6 @@ class _showMap extends State<showMap> {
           ])
       ));
       setState(() {
-
       });
     }
   }
@@ -149,6 +148,23 @@ class _showMap extends State<showMap> {
       dots = [];
       markers = [];
     });
+  }
+
+  void undo(){
+    print("---------------------");
+    int numOfRemain = 0;
+    int length = data.length;
+    for(int i = 1; i < length; i++){
+      if(data[length - i] == "," && data[length - (i + 1)] == "}") {numOfRemain = length - i; break;}
+    }
+    data = data.substring(0, numOfRemain);
+    dots.removeLast();
+    markers.removeLast();
+    print(data);
+    setState(() {
+
+    });
+
   }
 
   @override
@@ -181,6 +197,10 @@ class _showMap extends State<showMap> {
                 urlTemplate: "https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png",
                 subdomains: ['a', 'b', 'c'],
               ),
+              TileLayerOptions(
+                urlTemplate: "https://cyberjapandata.gsi.go.jp/xyz/hillshademap/{z}/{x}/{y}.png",
+                opacity : 0.5,
+              ),
               PolylineLayerOptions(
                 polylineCulling: false,
                 polylines: [
@@ -212,50 +232,9 @@ class _showMap extends State<showMap> {
               child: Icon(Icons.delete),
             ),
             FloatingActionButton(onPressed: input, child: Icon(Icons.input),),
+            FloatingActionButton(onPressed: undo, child: Icon(Icons.undo),)
             ],
           ),
-          GestureDetector(
-            dragStartBehavior: DragStartBehavior.down,
-            onPanUpdate: (dragUpdateDetails) {
-              position = dragUpdateDetails.localPosition;
-              setState(() {});
-            },
-            child: Stack(children : [Positioned(
-              // 左上からどれだけ右にあるか
-              left: position.dx,
-              // 左上からどれだけ下にあるか
-              top: position.dy,
-              child: Container(
-                width: 400,
-                height: 400,
-                child: TextField(
-                  controller: controller,
-                  maxLines: null,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.5),
-                  border: Border(
-                    left: BorderSide(
-                      color: Colors.black.withOpacity(0.5),
-                      width: 3,
-                    ),
-                    top: BorderSide(
-                      color: Colors.black.withOpacity(0.5),
-                      width: 8,
-                    ),
-                    right: BorderSide(
-                      color: Colors.black.withOpacity(0.5),
-                      width: 3,
-                    ),
-                    bottom: BorderSide(
-                      color: Colors.black.withOpacity(0.5),
-                      width: 3,
-                    ),
-                  )
-                ),
-              ),)],
-            ),
-          )
         ],
       )
     );
